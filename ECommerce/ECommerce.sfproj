@@ -37,7 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ECommerce.Api\ECommerce.Api.csproj">
-      <ServiceLaunchUrl>http://localhost:{ServicePort}/weatherforecast</ServiceLaunchUrl>
+      <ServiceLaunchUrl>http://localhost:{ServicePort}/api/products</ServiceLaunchUrl>
     </ProjectReference>
     <ProjectReference Include="..\ECommerce.ProductCatalog\ECommerce.ProductCatalog.csproj" />
   </ItemGroup>
