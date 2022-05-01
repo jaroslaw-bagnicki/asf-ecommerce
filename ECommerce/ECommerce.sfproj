@@ -36,6 +36,9 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ECommerce.Api\ECommerce.Api.csproj">
+      <ServiceLaunchUrl>http://localhost:{ServicePort}/weatherforecast</ServiceLaunchUrl>
+    </ProjectReference>
     <ProjectReference Include="..\ECommerce.ProductCatalog\ECommerce.ProductCatalog.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
