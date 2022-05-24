@@ -1,7 +1,11 @@
 ﻿using ECommerce.Api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.ServiceFabric.Actors;
+using Microsoft.ServiceFabric.Actors.Client;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using UserActor.Interfaces;
 
 namespace ECommerce.Api.Controllers
 {
@@ -10,9 +14,22 @@ namespace ECommerce.Api.Controllers
     public class BasketController : ControllerBase
     {
         [HttpGet("{userId}")]
-        public Task<ApiBasket> GetAsync(string userId)
+        public async Task<ApiBasket> GetAsync(string userId)
         {
-            throw new NotImplementedException();
+            var actor = GetActor(userId);
+
+            var products = await actor.GetBasket();
+
+            return new ApiBasket
+            {
+                UserId = userId,
+                Items = products.Select(
+                    p => new ApiBasketItem
+                    {
+                        ProductId = p.Key.ToString(),
+                        Quantinty = p.Value
+                    }).ToArray()
+            };
         }
 
         [HttpPost("userId")]
@@ -25,6 +42,11 @@ namespace ECommerce.Api.Controllers
         public Task DeleteAsyc(string userId)
         {
             throw new NotImplementedException();
+        }
+
+        private IUserActor GetActor(string userId)
+        {
+            return ActorProxy.Create<IUserActor>(new ActorId(userId), new Uri("fabric:/ECommnerce/UserActorService"));
         }
     }
 }
