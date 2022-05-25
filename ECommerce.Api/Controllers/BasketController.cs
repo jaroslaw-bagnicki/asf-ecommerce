@@ -32,7 +32,7 @@ namespace ECommerce.Api.Controllers
             };
         }
 
-        [HttpPost("userId")]
+        [HttpPost("{userId}")]
         public async Task AddAsync(string userId, [FromBody] ApiBasketAddRequest request)
         {
             var actor = GetActor(userId);
@@ -40,7 +40,7 @@ namespace ECommerce.Api.Controllers
             await actor.AddToBasket(request.ProductId, request.Quantity);
         }
 
-        [HttpDelete("userId")]
+        [HttpDelete("{userId}")]
         public async Task DeleteAsyc(string userId)
         {
             var actor = GetActor(userId);
@@ -50,7 +50,7 @@ namespace ECommerce.Api.Controllers
 
         private IUserActor GetActor(string userId)
         {
-            return ActorProxy.Create<IUserActor>(new ActorId(userId), new Uri("fabric:/ECommnerce/UserActorService"));
+            return ActorProxy.Create<IUserActor>(new ActorId(userId), new Uri("fabric:/ECommerce/UserActorService"));
         }
     }
 }
