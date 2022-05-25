@@ -33,15 +33,19 @@ namespace ECommerce.Api.Controllers
         }
 
         [HttpPost("userId")]
-        public Task AddAsync(string userId, [FromBody] ApiBasketAddRequest request)
+        public async Task AddAsync(string userId, [FromBody] ApiBasketAddRequest request)
         {
-            throw new NotImplementedException();
+            var actor = GetActor(userId);
+
+            await actor.AddToBasket(request.ProductId, request.Quantity);
         }
 
         [HttpDelete("userId")]
-        public Task DeleteAsyc(string userId)
+        public async Task DeleteAsyc(string userId)
         {
-            throw new NotImplementedException();
+            var actor = GetActor(userId);
+
+            await actor.ClearBasket();
         }
 
         private IUserActor GetActor(string userId)
