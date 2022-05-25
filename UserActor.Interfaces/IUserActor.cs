@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Remoting.FabricTransport;
@@ -12,7 +11,7 @@ namespace UserActor.Interfaces
     {
         Task AddToBasket(Guid productId, int quantity);
 
-        Task<Dictionary<Guid, int>> GetBasket();
+        Task<BasketItem[]> GetBasket();
 
         Task ClearBasket();
     }

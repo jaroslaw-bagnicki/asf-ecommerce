@@ -26,8 +26,8 @@ namespace ECommerce.Api.Controllers
                 Items = products.Select(
                     p => new ApiBasketItem
                     {
-                        ProductId = p.Key.ToString(),
-                        Quantinty = p.Value
+                        ProductId = p.ProductId.ToString(),
+                        Quantinty = p.Quantity
                     }).ToArray()
             };
         }

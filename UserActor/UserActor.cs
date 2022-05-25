@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
@@ -46,16 +46,19 @@ namespace UserActor
             }
         }
 
-        public async Task<Dictionary<Guid, int>> GetBasket()
+        public async Task<BasketItem[]> GetBasket()
         {
-            var result = new Dictionary<Guid, int>();
             var productIds = await StateManager.GetStateNamesAsync();
 
-            foreach(var productId in productIds)
+            var tasks = productIds.Select(async (id) => new BasketItem
             {
-                var quantity = await StateManager.GetStateAsync<int>(productId);
-                result.Add(Guid.Parse(productId), quantity);
-            }
+                ProductId = Guid.Parse(id),
+                Quantity = await StateManager.GetStateAsync<int>(id)
+            });
+
+            Task.WaitAll(tasks.ToArray());
+
+            var result = tasks.Select(t => t.Result).ToArray();
 
             return result;
         }
