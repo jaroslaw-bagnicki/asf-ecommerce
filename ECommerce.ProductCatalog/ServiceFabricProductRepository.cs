@@ -46,5 +46,25 @@ namespace ECommerce.ProductCatalog
 
             return result;
         }
+
+        internal async Task<Product> Get(Guid productId)
+        {
+            var products = await _stateManager.GetOrAddAsync<IReliableDictionary<Guid, Product>>("products");
+
+            using var tx = _stateManager.CreateTransaction();
+            var result =  await products.TryGetValueAsync(tx, productId);
+            await tx.CommitAsync();
+
+            if (result.HasValue)
+            {
+                return result.Value;
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Product with {productId} not found!");
+            }
+
+
+        }
     }
 }

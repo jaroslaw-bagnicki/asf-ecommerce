@@ -10,11 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="6.0.1017" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="6.0.1017" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ECommerce.CheckoutService.Model\ECommerce.CheckoutService.Model.csproj" />
+    <ProjectReference Include="..\UserActor.Interfaces\UserActor.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>
