@@ -5,7 +5,7 @@ namespace ECommerce.CheckoutService.Model
 {
     public class CheckoutSummary
     {
-        public List<CheckoutProduct> Products { get; set; }
+        public List<CheckoutProduct> Products { get; set; } = new List<CheckoutProduct>();
 
         public double TotalPrice { get; set; }
 

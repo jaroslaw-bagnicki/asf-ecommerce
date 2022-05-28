@@ -38,23 +38,30 @@ namespace ECommerce.CheckoutService
             var userActor = GetUserActor(userId);
             var basket = await userActor.GetBasket();
 
-            var result = new CheckoutSummary();
+            if (basket.Length == 0)
+            {
+                throw new InvalidOperationException("Basket doesn't contains any products!");
+            }
+
+            var summary = new CheckoutSummary();
 
             foreach(var basketItem in basket)
             {
                 var product = await _productCatalogService.GetProductAsync(basketItem.ProductId);
-                result.Products.Add(new CheckoutProduct
+                summary.Products.Add(new CheckoutProduct
                 {
                     Product = product,
                     Quantity = basketItem.Quantity,
-                    Price = product.Price * basketItem.Quantity
+                    Price = product.Price
                 });
 
             }
 
-            result.Date = DateTime.UtcNow;
+            summary.TotalPrice = summary.Products
+                .Aggregate<CheckoutProduct, double>(0, (total, product) => total + product.Price * product.Quantity);
+            summary.Date = DateTime.UtcNow;
 
-            return result;
+            return summary;
         }
 
         public Task<CheckoutSummary[]> GetOrderHistoryAsync(string userId)

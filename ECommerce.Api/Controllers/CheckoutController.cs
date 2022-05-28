@@ -37,7 +37,6 @@ namespace ECommerce.Api.Controllers
             return history.Select(MapToApiCheckoutSummary).ToArray();
         }
 
-
         private ApiCheckoutSummary MapToApiCheckoutSummary(CheckoutSummary summary)
         {
             return new ApiCheckoutSummary
@@ -45,6 +44,7 @@ namespace ECommerce.Api.Controllers
                 Products = summary.Products.Select(p => new ApiCheckoutProduct
                 {
                     ProductId = p.Product.Id,
+                    ProductName = p.Product.Name,
                     Quantity = p.Quantity,
                     Price = p.Price
                 }).ToArray(),
@@ -58,9 +58,11 @@ namespace ECommerce.Api.Controllers
             long key = LongRandom();
             
             var proxyFactory = new ServiceProxyFactory(_ => new FabricTransportServiceRemotingClientFactory());
-            return proxyFactory.CreateServiceProxy<ICheckoutService>(
-                new Uri("fabric:/Ecommerce/ECommerce.CheckoutService"),
+            var service = proxyFactory.CreateServiceProxy<ICheckoutService>(
+                new Uri("fabric:/ECommerce/ECommerce.CheckoutService"),
                 new ServicePartitionKey(key));
+
+            return service;
         }
 
         private long LongRandom()
