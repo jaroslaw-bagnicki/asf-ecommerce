@@ -21,7 +21,7 @@ namespace ECommerce.Api.Controllers
         }
 
 
-        [Route("{userId}")]
+        [HttpPost("{userId}")]
         public async Task<ApiCheckoutSummary> CheckoutAsync(string userId)
         {
             var summary = await GetCheckoutService().CheckoutAsync(userId);
@@ -29,7 +29,7 @@ namespace ECommerce.Api.Controllers
             return MapToApiCheckoutSummary(summary);
         }
 
-        [Route("history/{userId}")]
+        [HttpGet("history/{userId}")]
         public async Task<ApiCheckoutSummary[]> GetHistoryAsyc(string userId)
         {
             var history = await GetCheckoutService().GetOrderHistoryAsync(userId);
