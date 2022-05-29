@@ -64,6 +64,15 @@ namespace ECommerce.CheckoutService
                 .Aggregate<CheckoutProduct, double>(0, (total, product) => total + product.Price * product.Quantity);
             summary.Date = DateTime.UtcNow;
 
+            var historyState = await StateManager.GetOrAddAsync<IReliableDictionary<DateTime, CheckoutSummary>>(CheckoutHistoryKey);
+
+            using var tx = StateManager.CreateTransaction();
+            await historyState.AddAsync(tx, summary.Date, summary);
+
+            await GetUserActor(userId).ClearBasket();
+
+            await tx.CommitAsync();
+
             return summary;
         }
 
@@ -71,16 +80,18 @@ namespace ECommerce.CheckoutService
         {
             var result = new List<CheckoutSummary>();
             
-            var history = await StateManager.GetOrAddAsync<IReliableDictionary<DateTime, CheckoutSummary>>(CheckoutHistoryKey);
+            var historyState = await StateManager.GetOrAddAsync<IReliableDictionary<DateTime, CheckoutSummary>>(CheckoutHistoryKey);
 
             using var tx = StateManager.CreateTransaction();
-            var historyEnumerable = await history.CreateEnumerableAsync(tx, EnumerationMode.Ordered);
+            var historyEnumerable = await historyState.CreateEnumerableAsync(tx, EnumerationMode.Ordered);
             using var historyEnumerator = historyEnumerable.GetAsyncEnumerator();
 
             while (await historyEnumerator.MoveNextAsync(default))
             {
                 result.Add(historyEnumerator.Current.Value);
             }
+
+            await tx.CommitAsync();
 
             return result.ToArray();
         }
