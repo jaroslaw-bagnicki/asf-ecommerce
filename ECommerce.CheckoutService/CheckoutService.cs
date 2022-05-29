@@ -7,6 +7,7 @@ using ECommerce.CheckoutService.Model;
 using ECommerce.ProductCatalog.Model;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
@@ -22,6 +23,8 @@ namespace ECommerce.CheckoutService
     /// </summary>
     internal sealed class CheckoutService : StatefulService, ICheckoutService
     {
+        static string CheckoutHistoryKey = "history";
+        
         private readonly IProductCatalogService _productCatalogService;
 
         public CheckoutService(StatefulServiceContext context)
@@ -64,9 +67,22 @@ namespace ECommerce.CheckoutService
             return summary;
         }
 
-        public Task<CheckoutSummary[]> GetOrderHistoryAsync(string userId)
+        public async Task<CheckoutSummary[]> GetOrderHistoryAsync(string userId)
         {
-            throw new NotImplementedException();
+            var result = new List<CheckoutSummary>();
+            
+            var history = await StateManager.GetOrAddAsync<IReliableDictionary<DateTime, CheckoutSummary>>(CheckoutHistoryKey);
+
+            using var tx = StateManager.CreateTransaction();
+            var historyEnumerable = await history.CreateEnumerableAsync(tx, EnumerationMode.Ordered);
+            using var historyEnumerator = historyEnumerable.GetAsyncEnumerator();
+
+            while (await historyEnumerator.MoveNextAsync(default))
+            {
+                result.Add(historyEnumerator.Current.Value);
+            }
+
+            return result.ToArray();
         }
 
         private IUserActor GetUserActor(string userId)
